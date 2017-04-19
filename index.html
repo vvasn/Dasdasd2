@@ -1,0 +1,132 @@
+<!--
+Main html page for adding products to a order and then submitting the order.
+Created by Ville Suoraniemi using templates from https://www.w3schools.com/w3css/w3css_templates.asp
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DASD Phones inc.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body,h1,h2,h3,h4,h5,h6 {font-family: "Raleway", Arial, Helvetica, sans-serif}
+        .mySlides {display:none}
+    </style>
+</head>
+
+<body>
+
+<!-- Ordering Menu -->
+<nav class="w3-sidebar w3-light-grey w3-top" style="width:260px" id="mySidebar">
+    <div class="w3-container w3-display-container w3-padding-16">
+        <h3>Order Phones</h3>
+        <h6>Customise your product!</h6>
+        <hr>
+        <form id="orderForm" enctype="application/json">
+            <p><label><i class="fa fa-mobile-phone"></i> Frame Options</label></p>
+            <select name="frame">
+                <option selected disabled>Model</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+            </select>
+
+            <select name="framecolor">
+                <option selected disabled>Color</option>
+                <option value="r">Red</option>
+                <option value="g">Green</option>
+                <option value="b">Blue</option>
+            </select>
+
+            <p><label><i class="fa fa-mobile-phone"></i> Keyboard Options</label></p>
+            <select name="keyboard">
+                <option selected disabled>Model</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+            </select>
+
+            <select name="keyboardcolor">
+                <option selected disabled>Color</option>
+                <option value="r">Red</option>
+                <option value="g">Green</option>
+                <option value="b">Blue</option>
+            </select>
+
+            <p><label><i class="fa fa-mobile-phone"></i> Screen Options</label></p>
+            <select name="screen">
+                <option selected disabled>Model</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+            </select>
+
+            <select name="screencolor">
+                <option selected disabled>Color</option>
+                <option value="r">Red</option>
+                <option value="g">Green</option>
+                <option value="b">Blue</option>
+            </select>
+
+            <!-- <p><label><i class="fa fa-mobile-phone"></i> Amount</label></p>
+            <input class="w3-input w3-border" type="number" name="amount" value="1" min="1" max="99"> -->
+
+
+            <p><button class="w3-button w3-block w3-green w3-left-align" id="submitOrder">
+                <i class="fa fa-check-square-o w3-margin-right"></i> Submit Order!</button></p>
+        </form>
+
+        <p><a href="/orders" class="w3-button w3-block w3-blue w3-left-align">
+            <i class="fa fa-history w3-margin-right"></i> Track Orders</a></p>
+
+        <footer class="w3-container w3-padding-16" style="margin-top:32px">Powered by
+                <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS"
+                target="_blank" class="w3-hover-text-green">w3.css</a>
+        </footer>
+
+    </div>
+
+</nav>
+
+
+<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+
+    $(document).ready(function() {
+
+        var socket = io();
+
+        $('#submitOrder').click(function () {
+
+            var order =
+                {
+                    "id": "submitOrder",
+                    "information":
+                        {
+                            "frame":            document.getElementsByName("frame")[0].value,
+                            "screen":           document.getElementsByName("screen")[0].value,
+                            "keyboard":         document.getElementsByName("keyboard")[0].value,
+                            "framecolor":       document.getElementsByName("framecolor")[0].value,
+                            "screencolor":      document.getElementsByName("screencolor")[0].value,
+                            "keyboardcolor":    document.getElementsByName("keyboardcolor")[0].value,
+                            "destination":      1,  // Workstation number 1-12
+                            "paper":            0,  // 0 no paper, 1 has paper
+                            "rfid":             0
+                        }
+                };
+
+            socket.emit('submitOrder', order);
+
+        });
+
+    });
+
+</script>
+
+</body>
+</html>
