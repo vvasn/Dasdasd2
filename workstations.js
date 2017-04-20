@@ -29,10 +29,13 @@ workstation.prototype.runServer = function() {
 
     this.port = refport + this.location;
     var station = this;
+    var specs = [];
+
 
     var myServer = http.createServer(function (req, res) {
 
         var method = req.method;
+
 
         console.log("Method: " + method);
 
@@ -46,17 +49,14 @@ workstation.prototype.runServer = function() {
         } else if (method == 'POST') {
 
             var body = [];
+
             req.on('data', function(chunk) {
                 body.push(chunk);
                 console.log("Body: " + body.toString());
 
                 var msg = JSON.parse(body);
 
-                if (msg.frame == 'undefined'){
-
-                    return;
-
-                } else if ((msg.id == 'Z1_Changed') && (msg.payload.PalletID != '-1')){
+                if ((msg.id == 'Z1_Changed') && (msg.payload.PalletID != '-1')){
 
                     // Ask for pallet information here
                     station.getPalletInfo(msg.payload.PalletID);
@@ -67,6 +67,25 @@ workstation.prototype.runServer = function() {
                     station.movePallet(23);
 
                 } else if ((msg.id == 'Z3_Changed') && (msg.payload.PalletID != '-1')){
+
+                    if (station.capability == '1'){
+
+                        station.draw(4);
+                        station.updatePalletInfo(0, specs[1], specs[2], specs[8], specs);
+
+                    } else if (station.capability == '2'){
+
+                        station.draw(6);
+                        station.updatePalletInfo(specs[0], 0, specs[2], specs[8], specs);
+
+                    } else if (station.capability == '3'){
+
+                        station.draw(1);
+                        station.updatePalletInfo(specs[0], specs[1], 0, specs[8], specs);
+
+                    }
+
+                } else if (msg.id == 'DrawEndExecution'){
 
                     station.movePallet(35);
 
@@ -82,7 +101,7 @@ workstation.prototype.runServer = function() {
 
                     station.movePallet(14);
 
-                } else if ((msg.paper == '1')){
+                } else if ((msg.paper == '1')) {
 
                     // Trying to decide the next destination here
                     console.log("Current location: " + station.location);
@@ -91,21 +110,32 @@ workstation.prototype.runServer = function() {
                     var route = [];
                     var next;
 
-                    if (msg.frame != '0'){
+                    specs = [
+                        msg.frame,
+                        msg.screen,
+                        msg.keyboard,
+                        msg.framecolor,
+                        msg.screencolor,
+                        msg.keyboardcolor,
+                        msg.rfid,
+                        msg.paper,
+                        msg.destination
+                    ];
+
+                    if (msg.frame != '0') {
 
                         console.log("Finding next Frame workstation...");
 
-                        route = station.find('3', []);
+                        route = station.find('1', []);
 
-                        console.log("ROUTEHERE: " + route);
 
-                    } else if ((msg.frame == '0') && (msg.screen != '0')){
+                    } else if ((msg.frame == '0') && (msg.screen != '0')) {
 
                         console.log("Finding next Screen workstation...");
 
                         route = station.find('2', []);
 
-                    } else if ((msg.frame == '0') && (msg.screen == '0') && (msg.keyboard != '0')){
+                    } else if ((msg.frame == '0') && (msg.screen == '0') && (msg.keyboard != '0')) {
 
                         console.log("Finding next Keyboard workstation...");
 
@@ -113,31 +143,33 @@ workstation.prototype.runServer = function() {
 
                     }
 
-                    if (route !== undefined){
+
+                    if ((msg.frame == '0') && (msg.screen == '0') && (msg.keyboard == '0')){
+
+                        station.updatePalletInfo(specs[0], specs[1], specs[2], 1, specs);
+
+                    } else if (route !== undefined) {
 
                         next = route[route.length - 1].location;
 
                         console.log("Next destination is: " + next + ". Updating pallet info!")
 
-                        station.updatePalletInfo(msg.frame, msg.screen, msg.keyboard, next, msg);
+                        station.updatePalletInfo(specs[0], specs[1], specs[2], next, specs);
 
                     }
 
 
-                    if (next == station.location){
+                    if (next == station.location) {
 
                         station.movePallet(12);
 
-                    } else if(next !== station.location) {
+                    } else if (next !== station.location) {
 
                         station.movePallet(14);
 
                     }
 
-
-
                 }
-
         })
         }
 
@@ -155,6 +187,7 @@ workstation.prototype.initCell = function () {
     this.subscribeToStation('CNV', 'Z2_Changed');
     this.subscribeToStation('CNV', 'Z3_Changed');
     this.subscribeToStation('CNV', 'Z4_Changed');
+    this.subscribeToStation('ROB', 'DrawEndExecution');
 };
 
 
@@ -194,8 +227,6 @@ workstation.prototype.movePallet = function (zones) {
             }
         });
 
-
-
 };
 
 workstation.prototype.getPalletInfo = function (PalletID){
@@ -220,24 +251,24 @@ workstation.prototype.getPalletInfo = function (PalletID){
 };
 
 
-workstation.prototype.updatePalletInfo = function (frame, screen, keyboard, dest, msg) {
+workstation.prototype.updatePalletInfo = function (frame, screen, keyboard, dest, specs) {
 
     var options = {
         uri: localhost + 4007,
         method: 'POST',
         json: {
             "id" :          "updatePalletInfo",
-            "PalletID" :    msg.rfid,
+            "PalletID" :    specs[6],
             "Info" : {
                 "frame" :           frame,
                 "screen" :          screen,
                 "keyboard" :        keyboard,
-                "framecolor" :      msg.framecolor,
-                "screencolor" :     msg.screencolor,
-                "keyboardcolor" :   msg.keyboardcolor,
+                "framecolor" :      specs[3],
+                "screencolor" :     specs[4],
+                "keyboardcolor" :   specs[5],
                 "destination" :     dest,
-                "paper" :           msg.paper,
-                "rfid" :            msg.rfid
+                "paper" :           specs[7],
+                "rfid" :            specs[6]
             }
         }
     };
@@ -278,6 +309,23 @@ workstation.prototype.find = function (capability, path) {
     }
 
 };
+
+
+workstation.prototype.draw = function (model) {
+
+    port = refport + this.location;
+
+    console.log("Requesting pallet transfer...");
+    request.post('http://localhost:3000/RTU/SimROB' + this.location + '/services/Draw' + model,
+        {form:{destUrl: localhost + port}}, function(err, httpResponse, body){
+            if (err) {
+                console.log(err);
+            } else {
+                console.log("Drawing!");
+            }
+        });
+
+}
 
 
 var ws2 = new workstation(2,'1');
