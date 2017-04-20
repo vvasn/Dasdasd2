@@ -95,7 +95,9 @@ workstation.prototype.runServer = function() {
 
                         console.log("Finding next Frame workstation...");
 
-                        route = station.find('1', []);
+                        route = station.find('3', []);
+
+                        console.log("ROUTEHERE: " + route);
 
                     } else if ((msg.frame == '0') && (msg.screen != '0')){
 
@@ -111,7 +113,7 @@ workstation.prototype.runServer = function() {
 
                     }
 
-                    if (route != 'undefined'){
+                    if (route !== undefined){
 
                         next = route[route.length - 1].location;
 
