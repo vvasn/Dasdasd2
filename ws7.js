@@ -102,7 +102,27 @@ app.post('/', function (req, res){
 
     } else if ((req.body.id == 'Z3_Changed') && (req.body.payload.PalletID != '-1')) {
 
-        movePallet(35);
+        var tag = req.body.payload.PalletID;
+
+        if ((palletDB[tag].frame == 0) && (palletDB[tag].screen == 0)
+            && (palletDB[tag].keyboard == 0) && (palletDB[tag].paper == '0')){
+
+
+            delete palletDB[req.body.payload.PalletID];
+
+            setTimeout(function () {
+
+                unloadPallet();
+
+            }, 1000);
+
+        } else {
+
+            movePallet(35);
+
+        }
+
+
 
     }
 

@@ -54,16 +54,25 @@ app.post('/', function (req, res) {
     } else if (req.body.paper == '0') {
 
         console.log(req.body);
-        updatePalletInfo('1', specs, req.body.rfid)
+        updatePalletInfo('1', specs, req.body.rfid);
         loadPaper();
 
-    } else if(req.body.paper == '1'){
+    } else if((req.body.paper == '1') && (req.body.keyboard !== 0)){
 
         movePallet(35);
 
     } else if (req.body.id == 'PaperLoaded'){
 
         console.log(req.body.id);
+        movePallet(35);
+
+    } else if ((req.body.frame == '0') && (req.body.screen == '0') && (req.body.keyboard == '0')){
+
+        updatePalletInfo('0', specs, req.body.rfid);
+        unLoadPaper();
+
+    } else if (req.body.id == 'PaperUnloaded'){
+
         movePallet(35);
 
     }
@@ -143,9 +152,23 @@ function movePallet(zones) {
 // Function for requesting paper loading
 function loadPaper() {
 
-    console.log("Loading paper...")
+    console.log("Loading paper...");
 
     request.post('http://localhost:3000/RTU/SimROB1/services/LoadPaper',
+        {form:{destUrl:"http://localhost:" + port}}, function(err, httpResponse, body) {
+            if (err) {
+                console.log(err);
+            }
+        });
+}
+
+
+// Function for requesting paper loading
+function unLoadPaper() {
+
+    console.log("Unloading paper...");
+
+    request.post('http://localhost:3000/RTU/SimROB1/services/UnloadPaper',
         {form:{destUrl:"http://localhost:" + port}}, function(err, httpResponse, body) {
             if (err) {
                 console.log(err);
