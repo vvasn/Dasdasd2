@@ -69,19 +69,70 @@ workstation.prototype.runServer = function() {
                 } else if ((msg.id == 'Z3_Changed') && (msg.payload.PalletID != '-1')){
 
                     station.movePallet(35);
+
+                } else if((msg.id == 'Z3_Changed') && (msg.payload.PalletID = '-1')){
+
                     station.free = true;
 
                 } else if ((msg.id == 'Z4_Changed') && (msg.payload.PalletID != '-1')){
 
                     station.movePallet(45);
 
-                } else if (msg.destination == station.location){
-
-                    station.movePallet(12);
-
-                } else {
+                } else if ((msg.destination == 1) && (msg.paper == 0)){
 
                     station.movePallet(14);
+
+                } else if ((msg.paper == '1')){
+
+                    // Trying to decide the next destination here
+                    console.log("Current location: " + station.location);
+                    console.log("Current destination: " + msg.destination);
+
+                    var route = [];
+                    var next;
+
+                    if (msg.frame != '0'){
+
+                        console.log("Finding next Frame workstation...");
+
+                        route = station.find('1', []);
+
+                    } else if ((msg.frame == '0') && (msg.screen != '0')){
+
+                        console.log("Finding next Screen workstation...");
+
+                        route = station.find('2', []);
+
+                    } else if ((msg.frame == '0') && (msg.screen == '0') && (msg.keyboard != '0')){
+
+                        console.log("Finding next Keyboard workstation...");
+
+                        route = station.find('3', []);
+
+                    }
+
+                    if (route != 'undefined'){
+
+                        next = route[route.length - 1].location;
+
+                        console.log("Next destination is: " + next + ". Updating pallet info!")
+
+                        station.updatePalletInfo(msg.frame, msg.screen, msg.keyboard, next, msg);
+
+                    }
+
+
+                    if (next == station.location){
+
+                        station.movePallet(12);
+
+                    } else if(next !== station.location) {
+
+                        station.movePallet(14);
+
+                    }
+
+
 
                 }
 
@@ -164,6 +215,38 @@ workstation.prototype.getPalletInfo = function (PalletID){
             console.log(err);
         }
     });
+};
+
+
+workstation.prototype.updatePalletInfo = function (frame, screen, keyboard, dest, msg) {
+
+    var options = {
+        uri: localhost + 4007,
+        method: 'POST',
+        json: {
+            "id" :          "updatePalletInfo",
+            "PalletID" :    msg.rfid,
+            "Info" : {
+                "frame" :           frame,
+                "screen" :          screen,
+                "keyboard" :        keyboard,
+                "framecolor" :      msg.framecolor,
+                "screencolor" :     msg.screencolor,
+                "keyboardcolor" :   msg.keyboardcolor,
+                "destination" :     dest,
+                "paper" :           msg.paper,
+                "rfid" :            msg.rfid
+            }
+        }
+    };
+
+    request(options, function (err, response, body) {
+        if (err){
+            console.log(err);
+        }
+
+    })
+
 };
 
 
