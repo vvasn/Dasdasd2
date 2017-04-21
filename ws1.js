@@ -57,18 +57,14 @@ app.post('/', function (req, res) {
         updatePalletInfo('1', specs, req.body.rfid);
         loadPaper();
 
-    } else if((req.body.paper == '1') && (req.body.keyboard !== 0)){
-
-        movePallet(35);
-
-    } else if (req.body.id == 'PaperLoaded'){
+    } else if((req.body.id == 'PaperLoaded')||((req.body.paper == '1') && (req.body.keyboard !== 0))){
 
         console.log(req.body.id);
         movePallet(35);
 
     } else if ((req.body.frame == '0') && (req.body.screen == '0') && (req.body.keyboard == '0')){
 
-        updatePalletInfo('0', specs, req.body.rfid);
+        updatePalletInfo('2', specs, req.body.rfid);
         unLoadPaper();
 
     } else if (req.body.id == 'PaperUnloaded'){

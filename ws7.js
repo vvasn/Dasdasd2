@@ -104,9 +104,7 @@ app.post('/', function (req, res){
 
         var tag = req.body.payload.PalletID;
 
-        if ((palletDB[tag].frame == 0) && (palletDB[tag].screen == 0)
-            && (palletDB[tag].keyboard == 0) && (palletDB[tag].paper == '0')){
-
+        if (palletDB[tag].paper == '2'){
 
             delete palletDB[req.body.payload.PalletID];
 

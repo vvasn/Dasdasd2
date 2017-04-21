@@ -15,8 +15,7 @@ var localhost = "http://localhost:";
 var workstation = function workstation(location, capability) {
     this.location = location;
     this.capability = capability;   // 1 = frame, 2 = keyboard, 3 = screen
-    this.drawModel = '1';           // Model of frame/keyboard/screen
-    this.penColor = 'red';
+    this.color = "RED";
     this.free = true;
     this.url = '127.0.0.1';
     this.port = 1234;
@@ -66,22 +65,54 @@ workstation.prototype.runServer = function() {
                     station.free = false;
                     station.movePallet(23);
 
-                } else if ((msg.id == 'Z3_Changed') && (msg.payload.PalletID != '-1')){
+                } else if (((msg.id == 'Z3_Changed') && (msg.payload.PalletID != '-1')) || (msg.id == 'PenChanged')) {
 
-                    if (station.capability == '1'){
+                    console.log(station.color);
+                    console.log(specs[3]);
+                    console.log(specs[4]);
+                    console.log(specs[5]);
 
-                        station.draw(parseInt(specs[0]));
-                        station.updatePalletInfo(0, specs[1], specs[2], specs[8], specs);
+                    if (station.capability == '1') {
 
-                    } else if (station.capability == '2'){
+                        if (station.color == specs[3]) {
 
-                        station.draw(parseInt(specs[1]) + 3);
-                        station.updatePalletInfo(specs[0], 0, specs[2], specs[8], specs);
+                            station.draw(parseInt(specs[0]));
+                            station.updatePalletInfo(0, specs[1], specs[2], specs[8], specs);
 
-                    } else if (station.capability == '3'){
+                        } else {
 
-                        station.draw(parseInt(specs[2]) + 6);
-                        station.updatePalletInfo(specs[0], specs[1], 0, specs[8], specs);
+                            station.changePen(specs[3]);
+                            station.color = specs[3];
+
+                        }
+
+                    } else if (station.capability == '2') {
+
+                        if (station.color == specs[4]) {
+
+                            station.draw(parseInt(specs[0]) + 3);
+                            station.updatePalletInfo(specs[0], 0, specs[2], specs[8], specs);
+
+                        } else {
+
+                            station.changePen(specs[4]);
+                            station.color = specs[4];
+
+                        }
+
+                    } else if (station.capability == '3') {
+
+                        if (station.color == specs[5]) {
+
+                            station.draw(parseInt(specs[0]) + 6);
+                            station.updatePalletInfo(specs[0], specs[1], 0, specs[8], specs);
+
+                        } else {
+
+                            station.changePen(specs[5]);
+                            station.color = specs[5];
+
+                        }
 
                     }
 
@@ -97,7 +128,7 @@ workstation.prototype.runServer = function() {
 
                     station.movePallet(45);
 
-                } else if ((msg.destination == 1) && (msg.paper == 0)){
+                } else if (((msg.destination == 1) && (msg.paper == '0')) || (msg.paper == '2')){
 
                     station.movePallet(14);
 
@@ -188,6 +219,7 @@ workstation.prototype.initCell = function () {
     this.subscribeToStation('CNV', 'Z3_Changed');
     this.subscribeToStation('CNV', 'Z4_Changed');
     this.subscribeToStation('ROB', 'DrawEndExecution');
+    this.subscribeToStation('ROB', 'PenChanged');
 };
 
 
@@ -292,7 +324,7 @@ workstation.prototype.addConnection = function (who) {
 
 workstation.prototype.find = function (capability, path) {
 
-    if(capability == this.capability && this.free){
+    if (capability == this.capability && this.free){
         path.push(this);
         console.log(path);
         return path;
@@ -303,7 +335,7 @@ workstation.prototype.find = function (capability, path) {
         this.flagVisited = true;
         path.push(this);
 
-        for(var i=0; i < this.connections.length; i++){
+        for (var i=0; i < this.connections.length; i++){
             return this.connections[i].find(capability, path);
         }
     }
@@ -325,7 +357,24 @@ workstation.prototype.draw = function (model) {
             }
         });
 
-}
+};
+
+
+workstation.prototype.changePen = function (color) {
+
+    port = refport + this.location;
+
+    console.log("Requesting pen change...");
+    request.post('http://localhost:3000/RTU/SimROB' + this.location + '/services/ChangePen' + color,
+        {form:{destUrl: localhost + port}}, function(err, httpResponse, body){
+            if (err) {
+                console.log(err);
+            } else {
+                console.log("Changing pen!");
+            }
+        });
+
+};
 
 
 var ws2 = new workstation(2,'1');
