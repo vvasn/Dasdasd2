@@ -57,20 +57,22 @@ workstation.prototype.runServer = function() {
 
                 if ((msg.id == 'Z1_Changed') && (msg.payload.PalletID != '-1')){
 
-                    // Ask for pallet information here
+                    // Ask WS7 for pallet information
                     station.getPalletInfo(msg.payload.PalletID);
 
                 } else if ((msg.id == 'Z2_Changed') && (msg.payload.PalletID != '-1')){
 
+                    // Just move pallet forward to zone 3 and
+                    // set station status to 'busy'
                     station.free = false;
                     station.movePallet(23);
 
                 } else if (((msg.id == 'Z3_Changed') && (msg.payload.PalletID != '-1')) || (msg.id == 'PenChanged')) {
 
-                    console.log(station.color);
-                    console.log(specs[3]);
-                    console.log(specs[4]);
-                    console.log(specs[5]);
+                    // Draw different frames, screen or keyboards depending
+                    // on the station capability
+
+                    // Before drawing checks pen color and changes pen if needed
 
                     if (station.capability == '1') {
 

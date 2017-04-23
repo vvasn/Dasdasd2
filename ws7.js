@@ -68,8 +68,8 @@ app.post('/', function (req, res){
             framecolor :        0,
             screencolor :       0,
             keyboardcolor :     0,
-            destination:        1, 
-            paper :             0,
+            destination:        1,      // Workstation number, 1-12
+            paper :             0,      // 0 = no paper, 1 = paper, 2 = product ready
             rfid:               tag
         };
 
@@ -104,23 +104,17 @@ app.post('/', function (req, res){
 
         var tag = req.body.payload.PalletID;
 
+        // Pallet is deleted from the 'database' and then unloaded
         if (palletDB[tag].paper == '2'){
 
             delete palletDB[req.body.payload.PalletID];
-
-            setTimeout(function () {
-
-                unloadPallet();
-
-            }, 1000);
+            unloadPallet();
 
         } else {
 
             movePallet(35);
 
         }
-
-
 
     }
 
@@ -273,6 +267,15 @@ function subscribeToEvents() {
                 console.log(err);
             } else {
                 console.log("Subscribed to PalletLoaded!");
+            }
+        });
+
+    request.post('http://localhost:3000/RTU/SimROB7/events/PalletUnloaded/notifs',
+        {form:{destUrl: localhost + port}}, function(err, httpResponse, body){
+            if (err) {
+                console.log(err);
+            } else {
+                console.log("Subscribed to PalletUnloaded!");
             }
         });
 
