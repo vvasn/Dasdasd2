@@ -1,5 +1,5 @@
 # Multi-agent based system for controlling production line simulator
-# Assignment for DASD course
+Assignment for DASD course
 
 1. Run the local production line simulator
     Accessible after that at http://localhost:3000
