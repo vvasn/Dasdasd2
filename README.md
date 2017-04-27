@@ -1,4 +1,4 @@
-# Multi-agent based system for controlling production line simulator
+# Multi-agent based control system for production line simulator
 Assignment for DASD course
 
 1. Run the local production line simulator
