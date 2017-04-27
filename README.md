@@ -1,7 +1,7 @@
 # Multi-agent based control system for production line simulator
 Assignment for DASD course
 
-1. Run the local production line simulator
+1. Run the local production line simulator.
     Accessible after that at http://localhost:3000
     
 2. Run the .js files provided. ALWAYS run ws7.js first when starting the system.
