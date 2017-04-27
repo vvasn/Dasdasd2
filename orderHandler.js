@@ -1,5 +1,5 @@
 /*
-Created by Ville Suoraniemi on 11.4.2017.
+Created by Ville on 11.4.2017.
  */
 
 // Modules
@@ -27,6 +27,7 @@ app.get('/orders', function(req, res){
     res.sendFile(path.join(__dirname + '/orders.html'));
 });
 
+
 // Establishing socket.io connection
 io.on('connection', function(socket){
 
@@ -41,6 +42,7 @@ io.on('connection', function(socket){
 
 });
 
+
 // Send order to Workstation 7
 function send(order) {
 
@@ -54,8 +56,10 @@ function send(order) {
         json: order
 
     }, function (err, response, body){
+
         if (err) {
             console.log(err);
         }
+
     });
 }

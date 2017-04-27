@@ -1,5 +1,5 @@
 /*
-Created by Ville Suoraniemi
+Created by Ville
  */
 
 var app = require('express')();
@@ -12,7 +12,8 @@ app.use(bodyParser.json());
 var port = 4007;
 var localhost = "http://localhost:";
 
-// Storage for pallets in production
+// Storage array for pallets in production
+// Pseudo database
 var palletDB = [];
 
 
@@ -128,12 +129,15 @@ function loadPallet(information) {
 
     request.post('http://localhost:3000/RTU/SimROB7/services/LoadPallet',
         {form:{destUrl:"http://localhost:" + port}}, function(err, httpResponse, body){
+
             if(err) {
 
                 console.log(err);
 
             } else {
 
+                // Little delay so that the station has time to init an empty pallet
+                // before saving the pallet info to it.
                 setTimeout(function() {
 
                     var length = Object.keys(palletDB).length;
@@ -154,9 +158,8 @@ function loadPallet(information) {
 
                 }, 2000);
             }
+
         });
-
-
 }
 
 
@@ -167,9 +170,13 @@ function unloadPallet() {
 
     request.post('http://localhost:3000/RTU/SimROB7/services/UnloadPallet',
         {form:{destUrl:"http://localhost:" + port}}, function(err, httpResponse, body) {
+
             if (err) {
                 console.log(err);
+            } else {
+                console.log("Unloading pallet!");
             }
+
         });
 }
 
@@ -219,11 +226,13 @@ function movePallet(zones) {
     console.log("Requesting pallet transfer...");
     request.post('http://localhost:3000/RTU/SimCNV7/services/TransZone' + zones,
         {form:{destUrl: localhost + port}}, function(err, httpResponse, body){
+
             if (err) {
                 console.log(err);
             } else {
                 console.log("Moving pallet!");
             }
+
         });
 
 }
@@ -254,56 +263,68 @@ function subscribeToEvents() {
 
     request.post('http://localhost:3000/RTU/reset',
         {form:{destUrl: localhost + port}}, function(err, httpResponse, body){
+
             if (err) {
                 console.log(err);
             } else {
                 console.log("Simulator reset!");
             }
+
         });
 
     request.post('http://localhost:3000/RTU/SimROB7/events/PalletLoaded/notifs',
         {form:{destUrl: localhost + port}}, function(err, httpResponse, body){
+
             if (err) {
                 console.log(err);
             } else {
                 console.log("Subscribed to PalletLoaded!");
             }
+
         });
 
     request.post('http://localhost:3000/RTU/SimROB7/events/PalletUnloaded/notifs',
         {form:{destUrl: localhost + port}}, function(err, httpResponse, body){
+
             if (err) {
                 console.log(err);
             } else {
                 console.log("Subscribed to PalletUnloaded!");
             }
+
         });
 
     request.post('http://localhost:3000/RTU/SimCNV7/events/Z1_Changed/notifs',
         {form:{destUrl: localhost + port}}, function(err, httpResponse,body){
+
             if (err) {
                 console.log(err);
             } else {
                 console.log("Subscribed to CNV7 Zone 1");
             }
+
         });
 
     request.post('http://localhost:3000/RTU/SimCNV7/events/Z2_Changed/notifs',
         {form:{destUrl: localhost + port}}, function(err, httpResponse, body){
+
             if (err) {
                 console.log(err);
             } else {
                 console.log("Subscribed to CNV7 Zone 2");
             }
+
         });
 
     request.post('http://localhost:3000/RTU/SimCNV7/events/Z3_Changed/notifs',
         {form:{destUrl: localhost + port}}, function(err, httpResponse, body){
+
             if (err) {
                 console.log(err);
             } else {
                 console.log("Subscribed to CNV7 Zone 3");
             }
+
         });
 }
 

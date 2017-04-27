@@ -155,6 +155,8 @@ workstation.prototype.runServer = function() {
                         msg.destination
                     ];
 
+                    // Depending on what needs to be done next, define a path 'route' to nearest
+                    // station with the needed capability, by asking from connections
                     if (msg.frame != '0') {
 
                         console.log("Finding next Frame workstation...");
@@ -183,6 +185,7 @@ workstation.prototype.runServer = function() {
 
                     } else if (route !== undefined) {
 
+                        // Next destination is the location of last station in the path
                         next = route[route.length - 1].location;
 
                         console.log("Next destination is: " + next + ". Updating pallet info!")
@@ -247,6 +250,7 @@ workstation.prototype.subscribeToStation = function (station, event)
 
 };
 
+
 workstation.prototype.movePallet = function (zones) {
 
     port = refport + this.location;
@@ -254,14 +258,17 @@ workstation.prototype.movePallet = function (zones) {
     console.log("Requesting pallet transfer...");
     request.post('http://localhost:3000/RTU/SimCNV' + this.location + '/services/TransZone' + zones,
         {form:{destUrl: localhost + port}}, function(err, httpResponse, body){
+
             if (err) {
                 console.log(err);
             } else {
                 console.log("Moving pallet!");
             }
+
         });
 
 };
+
 
 workstation.prototype.getPalletInfo = function (PalletID){
 
@@ -352,11 +359,13 @@ workstation.prototype.draw = function (model) {
     console.log("Requesting pallet transfer...");
     request.post('http://localhost:3000/RTU/SimROB' + this.location + '/services/Draw' + model,
         {form:{destUrl: localhost + port}}, function(err, httpResponse, body){
+
             if (err) {
                 console.log(err);
             } else {
                 console.log("Drawing!");
             }
+
         });
 
 };
@@ -369,11 +378,13 @@ workstation.prototype.changePen = function (color) {
     console.log("Requesting pen change...");
     request.post('http://localhost:3000/RTU/SimROB' + this.location + '/services/ChangePen' + color,
         {form:{destUrl: localhost + port}}, function(err, httpResponse, body){
+
             if (err) {
                 console.log(err);
             } else {
                 console.log("Changing pen!");
             }
+
         });
 
 };

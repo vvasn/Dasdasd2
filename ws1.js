@@ -9,6 +9,8 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+
+// For quick use
 var port = 4001;
 var localhost = "http://localhost:";
 
@@ -32,11 +34,7 @@ app.post('/', function (req, res) {
         req.body.keyboardcolor
     ];
 
-    if (req.body.frame == 'undefined'){
-
-        return;
-
-    } else if ((req.body.id == 'Z1_Changed') && (req.body.payload.PalletID != '-1')){
+    if ((req.body.id == 'Z1_Changed') && (req.body.payload.PalletID != '-1')){
 
         console.log(req.body.id);
         movePallet(12);
@@ -90,9 +88,11 @@ function getPalletInfo(PalletID){
     };
 
     request(options, function (err, response, body) {
+
         if (err){
             console.log(err);
         }
+
     });
 }
 
@@ -121,10 +121,12 @@ function updatePalletInfo(paper, specs, ID) {
     };
 
     request(options, function (err, response, body) {
+
         if (err){
             console.log(err);
         }
-    })
+
+    });
 
 }
 
@@ -133,6 +135,7 @@ function updatePalletInfo(paper, specs, ID) {
 function movePallet(zones) {
 
     console.log("Requesting pallet transfer...");
+
     request.post('http://localhost:3000/RTU/SimCNV1/services/TransZone' + zones,
         {form:{destUrl: localhost + port}}, function(err, httpResponse, body){
             if (err) {
@@ -178,47 +181,57 @@ function subscribeToEvents() {
 
     request.post('http://localhost:3000/RTU/SimROB1/events/PaperLoaded/notifs',
         {form:{destUrl: localhost + port}}, function(err, httpResponse, body){
+
             if (err) {
                 console.log(err);
             } else {
                 console.log("Subscribed to PaperLoaded!");
             }
+
         });
 
     request.post('http://localhost:3000/RTU/SimROB1/events/PaperUnloaded/notifs',
         {form:{destUrl: localhost + port}}, function(err, httpResponse, body){
+
             if (err) {
                 console.log(err);
             } else {
                 console.log("Subscribed to PaperUnloaded!");
             }
+
         });
 
     request.post('http://localhost:3000/RTU/SimCNV1/events/Z1_Changed/notifs',
         {form:{destUrl: localhost + port}}, function(err, httpResponse,body){
+
             if (err) {
                 console.log(err);
             } else {
                 console.log("Subscribed to CNV1 Zone 1");
             }
+
         });
 
     request.post('http://localhost:3000/RTU/SimCNV1/events/Z2_Changed/notifs',
         {form:{destUrl: localhost + port}}, function(err, httpResponse, body){
+
             if (err) {
                 console.log(err);
             } else {
                 console.log("Subscribed to CNV1 Zone 2");
             }
+
         });
 
     request.post('http://localhost:3000/RTU/SimCNV1/events/Z3_Changed/notifs',
         {form:{destUrl: localhost + port}}, function(err, httpResponse, body){
+
             if (err) {
                 console.log(err);
             } else {
                 console.log("Subscribed to CNV1 Zone 3");
             }
+
         });
 }
 
