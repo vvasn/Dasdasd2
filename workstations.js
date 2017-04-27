@@ -92,7 +92,7 @@ workstation.prototype.runServer = function() {
 
                         if (station.color == specs[4]) {
 
-                            station.draw(parseInt(specs[0]) + 3);
+                            station.draw(parseInt(specs[1]) + 3);
                             station.updatePalletInfo(specs[0], 0, specs[2], specs[8], specs);
 
                         } else {
@@ -106,7 +106,7 @@ workstation.prototype.runServer = function() {
 
                         if (station.color == specs[5]) {
 
-                            station.draw(parseInt(specs[0]) + 6);
+                            station.draw(parseInt(specs[2]) + 6);
                             station.updatePalletInfo(specs[0], specs[1], 0, specs[8], specs);
 
                         } else {
